@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParkEase — Sivakasi Smart Parking</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #05050d;
+  --surface: #0d0d1a;
+  --card: #111120;
+  --border: #1e1e35;
+  --accent: #7c5cfc;
+  --accent2: #00d4ff;
+  --green: #00f5a0;
+  --red: #ff4d6d;
+  --yellow: #ffd60a;
+  --text: #eeeef8;
+  --muted: #5a5a80;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.blob-wrap {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.18;
+  animation: float 12s ease-in-out infinite;
+}
+.blob1 { width:500px; height:500px; background:#7c5cfc; top:-150px; left:-100px; animation-delay:0s; }
+.blob2 { width:400px; height:400px; background:#00d4ff; bottom:-100px; right:-80px; animation-delay:-4s; }
+.blob3 { width:300px; height:300px; background:#00f5a0; top:40%; left:60%; animation-delay:-8s; }
+@keyframes float {
+  0%,100% { transform:translate(0,0) scale(1); }
+  33% { transform:translate(30px,-40px) scale(1.05); }
+  66% { transform:translate(-20px,30px) scale(0.95); }
+}
+
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: radial-gradient(rgba(124,92,252,0.12) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events:none;
+  z-index:0;
+}
+
+.container { max-width:1100px; margin:0 auto; padding:0 28px; position:relative; z-index:1; }
+
+header {
+  position:sticky; top:0; z-index:100;
+  padding:18px 0;
+  border-bottom:1px solid rgba(124,92,252,0.15);
+  background: rgba(5,5,13,0.85);
+  backdrop-filter: blur(20px);
+}
+.header-inner { display:flex; align-items:center; justify-content:space-between; }
+.logo {
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:1.9rem;
+  letter-spacing:-1px;
+  background: linear-gradient(135deg,#7c5cfc,#00d4ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 0 16px rgba(124,92,252,0.5));
+}
+.logo-dot { -webkit-text-fill-color:#00f5a0; }
+.tagline {
+  font-size:0.65rem;
+  font-weight:600;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  background:linear-gradient(90deg,#7c5cfc,#00d4ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-top:2px;
+}
+.header-location {
+  font-size:0.88rem;
+  font-weight:700;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:6px;
+  justify-content:flex-end;
+}
+.loc-dot {
+  width:8px; height:8px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px var(--green);
+  animation: pulse 2s infinite;
+}
+.header-sub { font-size:0.7rem; color:var(--muted); margin-top:3px; }
+
+.hero { padding:64px 0 44px; }
+.hero-chip {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(124,92,252,0.1);
+  border:1px solid rgba(124,92,252,0.25);
+  border-radius:100px;
+  padding:5px 14px;
+  font-size:0.72rem;
+  font-weight:600;
+  color:#9a80ff;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:22px;
+}
+.chip-dot {
+  width:6px; height:6px;
+  border-radius:50%;
+  background:#7c5cfc;
+  box-shadow:0 0 6px #7c5cfc;
+  animation:pulse 1.5s infinite;
+}
+
+.hero h1 {
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:clamp(2.8rem,5.5vw,5rem);
+  line-height:1.05;
+  letter-spacing:-2px;
+}
+.line1 { color:var(--text); display:block; }
+.line2 {
+  display:block;
+  background:linear-gradient(135deg,#7c5cfc 0%,#00d4ff 50%,#00f5a0 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(124,92,252,0.4));
+}
+
+.hero-sub {
+  margin-top:18px;
+  font-size:1rem;
+  color:#6868a0;
+  line-height:1.75;
+  max-width:440px;
+}
+.hero-sub b { color:#a0a0d8; font-weight:600; }
+
+.stats { display:flex; gap:16px; margin-top:36px; flex-wrap:wrap; }
+.stat-card {
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 22px;
+  min-width:100px;
+  position:relative;
+  overflow:hidden;
+  transition:border-color 0.3s, transform 0.2s;
+}
+.stat-card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:2px;
+  border-radius:2px;
+}
+.stat-card.s1::before { background:linear-gradient(90deg,#7c5cfc,#00d4ff); }
+.stat-card.s2::before { background:linear-gradient(90deg,#00f5a0,#00d4ff); }
+.stat-card.s3::before { background:linear-gradient(90deg,#ff4d6d,#ff9a3c); }
+.stat-card:hover { border-color:rgba(124,92,252,0.3); transform:translateY(-2px); }
+.stat-num {
+  font-family:'Syne',sans-serif;
+  font-size:2.4rem;
+  font-weight:800;
+  line-height:1;
+}
+.s1 .stat-num { background:linear-gradient(135deg,#7c5cfc,#00d4ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.s2 .stat-num { background:linear-gradient(135deg,#00f5a0,#00d4ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.s3 .stat-num { background:linear-gradient(135deg,#ff4d6d,#ff9a3c); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.stat-lbl { font-size:0.62rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+
+.sec-head { display:flex; align-items:center; gap:14px; margin-bottom:16px; margin-top:20px; }
+.sec-head h2 {
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:1.5rem;
+  letter-spacing:-0.5px;
+  background:linear-gradient(90deg,#eeeef8,#5a5a80);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  white-space:nowrap;
+}
+.sec-line { flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+
+.live-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(0,245,160,0.07);
+  border:1px solid rgba(0,245,160,0.2);
+  color:#00f5a0;
+  padding:6px 14px;
+  border-radius:100px;
+  font-size:0.75rem;
+  font-weight:600;
+  margin-bottom:18px;
+}
+
+.legend { display:flex; gap:22px; margin-bottom:22px; flex-wrap:wrap; }
+.legend-item { display:flex; align-items:center; gap:8px; font-size:0.76rem; font-weight:500; color:#6868a0; }
+.ldot { width:12px; height:12px; border-radius:3px; }
+.ldot.av { background:var(--green); box-shadow:0 0 6px rgba(0,245,160,0.5); }
+.ldot.bk { background:var(--red); box-shadow:0 0 6px rgba(255,77,109,0.4); }
+.ldot.sl { background:var(--accent); box-shadow:0 0 6px rgba(124,92,252,0.5); }
+
+.lot-wrap {
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:28px;
+  position:relative;
+  overflow:visible;
+}
+.lot-wrap::after {
+  content:'PARKING LOT · SIVAKASI';
+  position:absolute;
+  top:18px; right:22px;
+  font-family:'Space Mono',monospace;
+  font-size:0.6rem;
+  letter-spacing:3px;
+  color:rgba(124,92,252,0.2);
+}
+.row-label {
+  font-size:0.62rem;
+  font-weight:700;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:#3a3a60;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.row-label::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.04); }
+
+.slots-row {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(76px,1fr));
+  gap:10px;
+  margin-bottom:8px;
+}
+
+.road {
+  height:44px;
+  margin:16px 0;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px;
+  overflow:hidden;
+}
+.road::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:rgba(0,212,255,0.04);
+  border-top:1px dashed rgba(0,212,255,0.15);
+  border-bottom:1px dashed rgba(0,212,255,0.15);
+}
+.road-text {
+  font-family:'Space Mono',monospace;
+  font-size:0.6rem;
+  letter-spacing:4px;
+  color:rgba(0,212,255,0.25);
+  text-transform:uppercase;
+  z-index:1;
+}
+
+.slot {
+  aspect-ratio:0.58;
+  border-radius:10px;
+  border:1.5px solid transparent;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  position:relative;
+  user-select:none;
+  overflow:visible;
+}
+.slot.available {
+  background:rgba(0,245,160,0.07);
+  border-color:rgba(0,245,160,0.2);
+  color:var(--green);
+}
+.slot.available:hover {
+  background:rgba(0,245,160,0.14);
+  border-color:var(--green);
+  transform:translateY(-5px) scale(1.04);
+  box-shadow:0 12px 28px rgba(0,245,160,0.18);
+}
+.slot.booked {
+  background:rgba(255,77,109,0.07);
+  border-color:rgba(255,77,109,0.2);
+  color:var(--red);
+  cursor:pointer;
+}
+.slot.booked:hover {
+  background:rgba(255,77,109,0.12);
+  border-color:var(--red);
+  transform:translateY(-3px);
+  box-shadow:0 8px 20px rgba(255,77,109,0.15);
+}
+.slot.booked:hover .slot-tooltip { display:block; }
+.slot.selected {
+  background:rgba(124,92,252,0.15);
+  border-color:var(--accent);
+  color:var(--accent);
+  transform:translateY(-6px) scale(1.05);
+  box-shadow:0 14px 32px rgba(124,92,252,0.3);
+}
+
+.slot-icon { font-size:1.5rem; margin-bottom:3px; }
+.slot-id { font-family:'Space Mono',monospace; font-size:0.72rem; font-weight:700; }
+.slot-free-hint { font-size:0.48rem; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,77,109,0.55); margin-top:3px; font-weight:700; }
+
+.slot-tooltip {
+  display:none;
+  position:absolute;
+  bottom:calc(100% + 12px);
+  left:50%;
+  transform:translateX(-50%);
+  background:#0d0d1f;
+  border:1px solid rgba(255,77,109,0.3);
+  border-radius:12px;
+  padding:11px 14px;
+  width:170px;
+  z-index:200;
+  box-shadow:0 10px 30px rgba(0,0,0,0.6);
+  text-align:left;
+  pointer-events:none;
+}
+.slot-tooltip::after {
+  content:'';
+  position:absolute;
+  top:100%; left:50%;
+  transform:translateX(-50%);
+  border:7px solid transparent;
+  border-top-color:rgba(255,77,109,0.3);
+}
+.tip-row { margin-bottom:7px; }
+.tip-row:last-child { margin-bottom:0; }
+.tip-label { font-size:0.56rem; text-transform:uppercase; letter-spacing:2px; color:#4a4a70; font-weight:700; }
+.tip-val { font-size:0.8rem; color:#d0d0f0; font-weight:600; font-family:'Space Mono',monospace; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.booking-panel {
+  background:rgba(124,92,252,0.05);
+  border:1px solid rgba(124,92,252,0.2);
+  border-radius:20px;
+  padding:30px;
+  margin-top:28px;
+  margin-bottom:60px;
+  display:none;
+  animation:slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  position:relative;
+  overflow:hidden;
+}
+.booking-panel::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:2px;
+  background:linear-gradient(90deg,#7c5cfc,#00d4ff,#00f5a0);
+}
+.booking-panel.show { display:block; }
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(30px) scale(0.98); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+.booking-panel h3 {
+  font-family:'Syne',sans-serif;
+  font-size:1.5rem;
+  font-weight:800;
+  letter-spacing:-0.5px;
+  margin-bottom:20px;
+  background:linear-gradient(135deg,#7c5cfc,#00d4ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.slot-info-bar {
+  display:flex;
+  align-items:center;
+  gap:18px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:14px;
+  padding:16px 20px;
+  margin-bottom:24px;
+}
+.slot-badge-big {
+  font-family:'Space Mono',monospace;
+  font-size:1.7rem;
+  font-weight:700;
+  background:linear-gradient(135deg,#7c5cfc,#00d4ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  line-height:1;
+}
+.slot-info-text small { display:block; font-size:0.62rem; text-transform:uppercase; letter-spacing:2px; color:var(--muted); font-weight:700; }
+.slot-info-text .slot-name { font-size:0.9rem; font-weight:700; margin-top:3px; }
+.slot-avail { font-size:0.75rem; color:var(--green); font-weight:600; margin-top:2px; display:flex; align-items:center; gap:5px; }
+.slot-info-rate { margin-left:auto; text-align:right; }
+.rate-lbl { font-size:0.6rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); font-weight:700; }
+.rate-val { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; color:var(--yellow); filter:drop-shadow(0 0 6px rgba(255,214,10,0.3)); }
+
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}}
+
+.form-group label {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:0.67rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  color:#4a4a80;
+  margin-bottom:8px;
+}
+.form-group input, .form-group select {
+  width:100%;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;
+  padding:13px 16px;
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  font-size:0.92rem;
+  outline:none;
+  font-weight:500;
+  transition:all 0.2s;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color:rgba(124,92,252,0.5);
+  box-shadow:0 0 0 3px rgba(124,92,252,0.1);
+  background:rgba(124,92,252,0.05);
+}
+.form-group input::placeholder { color:#2e2e52; }
+.form-group select option { background:#0d0d1a; }
+
+.btn-book {
+  width:100%;
+  margin-top:22px;
+  padding:18px;
+  background:linear-gradient(135deg,#7c5cfc 0%,#00d4ff 100%);
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  font-family:'Syne',sans-serif;
+  font-size:1.1rem;
+  font-weight:800;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all 0.25s;
+  box-shadow:0 6px 24px rgba(124,92,252,0.3);
+  position:relative;
+  overflow:hidden;
+}
+.btn-book::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+  opacity:0;
+  transition:opacity 0.2s;
+}
+.btn-book:hover { transform:translateY(-3px); box-shadow:0 14px 36px rgba(124,92,252,0.45); }
+.btn-book:hover::before { opacity:1; }
+.btn-book:active { transform:translateY(0); }
+
+.modal-overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(12px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+.modal-overlay.show { display:flex; animation:fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0}to{opacity:1} }
+
+.modal {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:40px 36px;
+  max-width:420px;
+  width:90%;
+  text-align:center;
+  animation:popIn 0.45s cubic-bezier(0.34,1.56,0.64,1);
+  position:relative;
+  overflow:hidden;
+}
+.modal::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:3px;
+  background:linear-gradient(90deg,#7c5cfc,#00d4ff,#00f5a0);
+}
+@keyframes popIn { from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1} }
+
+.modal .check { font-size:3.5rem; margin-bottom:14px; display:block; }
+.modal h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:2rem; letter-spacing:-0.5px; margin-bottom:6px; }
+.modal h2.success { background:linear-gradient(135deg,#00f5a0,#00d4ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 0 12px rgba(0,245,160,0.35)); }
+.modal h2.danger { background:linear-gradient(135deg,#ff4d6d,#ff9a3c); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.modal p { color:#5a5a90; font-size:0.9rem; line-height:1.7; margin-bottom:6px; }
+.modal p b { color:#9090c0; font-weight:600; }
+
+.ticket-no {
+  font-family:'Space Mono',monospace;
+  font-size:1.9rem;
+  font-weight:700;
+  background:linear-gradient(135deg,#ffd60a,#ff9a3c);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 0 10px rgba(255,214,10,0.35));
+  margin:14px 0;
+  letter-spacing:2px;
+}
+
+.modal-details {
+  background:rgba(255,255,255,0.025);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:14px 18px;
+  margin:16px 0;
+  text-align:left;
+}
+.detail-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:9px 0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  font-size:0.86rem;
+}
+.detail-row:last-child { border-bottom:none; }
+.dlabel { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#3a3a68; }
+.dval { font-weight:600; color:#b0b0d8; }
+.modal-hint { font-size:0.7rem; color:#3a3a68; margin-top:4px; }
+
+.btn-close {
+  width:100%;
+  margin-top:14px;
+  padding:15px;
+  background:linear-gradient(135deg,#7c5cfc,#00d4ff);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  font-family:'Syne',sans-serif;
+  font-size:1rem;
+  font-weight:800;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all 0.2s;
+  box-shadow:0 4px 16px rgba(124,92,252,0.25);
+}
+.btn-close:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(124,92,252,0.4); }
+
+.modal-btns { display:flex; gap:12px; margin-top:20px; }
+.btn-cancel {
+  flex:1; padding:14px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;
+  color:#8080b0;
+  font-family:'Syne',sans-serif;
+  font-size:0.95rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-cancel:hover { background:rgba(255,255,255,0.08); color:var(--text); }
+.btn-remove {
+  flex:1; padding:14px;
+  background:linear-gradient(135deg,#ff4d6d,#ff2244);
+  border:none;
+  border-radius:12px;
+  color:#fff;
+  font-family:'Syne',sans-serif;
+  font-size:0.95rem;
+  font-weight:800;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:all 0.2s;
+  box-shadow:0 4px 16px rgba(255,77,109,0.3);
+}
+.btn-remove:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(255,77,109,0.45); }
+
+@keyframes pulse {
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:0.5;transform:scale(1.4);}
+}
+</style>
+</head>
+<body>
+
+<div class="blob-wrap">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+</div>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div>
+        <div class="logo">Park<span class="logo-dot">.</span>Ease</div>
+        <div class="tagline">Smart Parking System</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="header-location">
+          <div class="loc-dot"></div>
+          Lot A — Sivakasi
+        </div>
+        <div class="header-sub">Open 24 / 7 &nbsp;·&nbsp; CCTV Secured</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <div class="hero-chip">
+      <div class="chip-dot"></div>
+      Live Availability — Sivakasi
+    </div>
+    <h1>
+      <span class="line1">Reserve Your</span>
+      <span class="line2">Perfect Spot</span>
+    </h1>
+    <p class="hero-sub">
+      Pick a <b>green slot</b> on the map, enter your vehicle info,
+      and lock your space instantly. Zero queues. Zero hassle.
+    </p>
+    <div class="stats">
+      <div class="stat-card s1">
+        <div class="stat-num" id="totalSlots">20</div>
+        <div class="stat-lbl">Total Slots</div>
+      </div>
+      <div class="stat-card s2">
+        <div class="stat-num" id="availCount">—</div>
+        <div class="stat-lbl">Open Now</div>
+      </div>
+      <div class="stat-card s3">
+        <div class="stat-num" id="bookedCount">—</div>
+        <div class="stat-lbl">Occupied</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="sec-head">
+    <h2>🅿 Live Parking Map</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="live-badge">
+    <div class="loc-dot"></div>
+    <span id="liveBadge">Checking availability...</span>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="ldot av"></div>Available — Tap to Book</div>
+    <div class="legend-item"><div class="ldot bk"></div>Occupied — Tap to Free</div>
+    <div class="legend-item"><div class="ldot sl"></div>Your Selection</div>
+  </div>
+
+  <div class="lot-wrap">
+    <div class="row-label">Row A &nbsp;·&nbsp; North Wing</div>
+    <div class="slots-row" id="rowA"></div>
+    <div class="road"><div class="road-text">← Entry &nbsp;/&nbsp; Exit Lane →</div></div>
+    <div class="row-label">Row B &nbsp;·&nbsp; South Wing</div>
+    <div class="slots-row" id="rowB"></div>
+  </div>
+
+  <div class="booking-panel" id="bookingPanel">
+    <h3>🚀 Lock In Your Spot</h3>
+    <div class="slot-info-bar">
+      <div class="slot-badge-big" id="selectedSlotId">A1</div>
+      <div class="slot-info-text">
+        <small>Selected Slot</small>
+        <div class="slot-name" id="slotRow">Row A · Slot 1</div>
+        <div class="slot-avail"><div class="loc-dot" style="width:6px;height:6px;"></div>Available &amp; Ready</div>
+      </div>
+      <div class="slot-info-rate">
+        <div class="rate-lbl">Rate</div>
+        <div class="rate-val">₹30 / hr</div>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>🚘 Vehicle Number</label>
+        <input type="text" id="vehicleNo" placeholder="TN 01 AB 1234" maxlength="13"
+          style="text-transform:uppercase;font-family:'Space Mono',monospace;letter-spacing:1.5px;"
+          oninput="formatVehicleNo(this)">
+      </div>
+      <div class="form-group">
+        <label>👤 Owner Name</label>
+        <input type="text" id="ownerName" placeholder="Enter your name" style="text-transform:capitalize;">
+      </div>
+      <div class="form-group">
+        <label>🔧 Vehicle Type</label>
+        <select id="vehicleType">
+          <option value="Car">Car 🚗</option>
+          <option value="SUV">SUV 🚙</option>
+          <option value="Bike">Bike 🏍️</option>
+          <option value="Truck">Truck 🚛</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>⏱ Duration</label>
+        <select id="duration">
+          <option value="1">1 Hour — ₹30</option>
+          <option value="2">2 Hours — ₹60</option>
+          <option value="3">3 Hours — ₹90</option>
+          <option value="4">4 Hours — ₹120</option>
+          <option value="8">Full Day — ₹200</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-book" onclick="confirmBooking()">⚡ Confirm &amp; Book Now</button>
+  </div>
+</main>
+
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <span class="check">🎉</span>
+    <h2 class="success">You're All Set!</h2>
+    <p>Your slot has been <b>successfully reserved.</b><br>Show this at the entry gate.</p>
+    <div class="ticket-no" id="ticketNo">#PK0001</div>
+    <div class="modal-details">
+      <div class="detail-row"><span class="dlabel">Slot</span><span class="dval" id="m_slot">—</span></div>
+      <div class="detail-row"><span class="dlabel">Vehicle</span><span class="dval" id="m_vehicle">—</span></div>
+      <div class="detail-row"><span class="dlabel">Owner</span><span class="dval" id="m_owner">—</span></div>
+      <div class="detail-row"><span class="dlabel">Duration</span><span class="dval" id="m_duration">—</span></div>
+      <div class="detail-row"><span class="dlabel">Amount</span><span class="dval" id="m_amount" style="color:var(--yellow);font-size:1rem;">—</span></div>
+    </div>
+    <p class="modal-hint">📋 Save this ticket number for a smooth exit.</p>
+    <button class="btn-close" onclick="closeModal()">✓ Done</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="removeModal">
+  <div class="modal">
+    <span class="check">🗑️</span>
+    <h2 class="danger">Remove Booking?</h2>
+    <p>Slot <b id="removeSlotId" style="color:#d0d0f0;font-size:1.1rem;"></b> booking-ஐ cancel பண்ண விரும்புறீங்களா?</p>
+    <p style="margin-top:6px;font-size:0.78rem;color:#3a3a68;">இந்த slot available ஆகும் — வேற யாரும் book பண்ணலாம்.</p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="cancelRemove()">✕ Cancel</button>
+      <button class="btn-remove" onclick="confirmRemove()">Yes, Remove</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const preBooked = ['A2','A5','A7','A10','B1','B4','B6','B9'];
+  const slots = {};
+  let selectedSlot = null;
+  let slotToRemove = null;
+  let bookingCount = 1;
+
+  function formatVehicleNo(input) {
+    let raw = input.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase();
+    let parts = [];
+    if (raw.length > 0) parts.push(raw.substring(0,2));
+    if (raw.length > 2) parts.push(raw.substring(2,4));
+    if (raw.length > 4) parts.push(raw.substring(4,6));
+    if (raw.length > 6) parts.push(raw.substring(6,10));
+    input.value = parts.join(' ');
+  }
+
+  function buildBookedHTML(id) {
+    const s = slots[id];
+    const hasInfo = s.vehicle && s.owner;
+    const tooltip = hasInfo ? `
+      <div class="slot-tooltip">
+        <div class="tip-row"><div class="tip-label">Vehicle</div><div class="tip-val">${s.vehicle}</div></div>
+        <div class="tip-row"><div class="tip-label">Owner</div><div class="tip-val">${s.owner}</div></div>
+        <div class="tip-row"><div class="tip-label">Type</div><div class="tip-val">${s.type}</div></div>
+      </div>` : '';
+    return `<div class="slot-icon">🚗</div><div class="slot-id">${id}</div><div class="slot-free-hint">tap to free</div>${tooltip}`;
+  }
+
+  function generateSlots() {
+    const rowAEl = document.getElementById('rowA');
+    const rowBEl = document.getElementById('rowB');
+    for (let i=1;i<=10;i++) {
+      const id='A'+i;
+      slots[id]={status:preBooked.includes(id)?'booked':'available',row:'A',num:i};
+      rowAEl.appendChild(createSlotEl(id));
+    }
+    for (let i=1;i<=10;i++) {
+      const id='B'+i;
+      slots[id]={status:preBooked.includes(id)?'booked':'available',row:'B',num:i};
+      rowBEl.appendChild(createSlotEl(id));
+    }
+    updateStats();
+  }
+
+  function createSlotEl(id) {
+    const div = document.createElement('div');
+    div.className = 'slot ' + slots[id].status;
+    div.id = 'slot_' + id;
+    if (slots[id].status === 'booked') {
+      div.innerHTML = buildBookedHTML(id);
+      div.onclick = () => askRemoveSlot(id);
+    } else {
+      div.innerHTML = `<div class="slot-icon">⬜</div><div class="slot-id">${id}</div>`;
+      div.onclick = () => selectSlot(id);
+    }
+    return div;
+  }
+
+  function selectSlot(id) {
+    if (slots[id].status === 'booked') return;
+    if (selectedSlot) {
+      const prev = document.getElementById('slot_'+selectedSlot);
+      prev.className = 'slot available';
+      prev.innerHTML = `<div class="slot-icon">⬜</div><div class="slot-id">${selectedSlot}</div>`;
+      prev.onclick = () => selectSlot(selectedSlot);
+    }
+    selectedSlot = id;
+    const el = document.getElementById('slot_'+id);
+    el.className = 'slot selected';
+    el.innerHTML = `<div class="slot-icon">📍</div><div class="slot-id">${id}</div>`;
+    document.getElementById('selectedSlotId').textContent = id;
+    document.getElementById('slotRow').textContent = `Row ${slots[id].row} · Slot ${slots[id].num}`;
+    document.getElementById('bookingPanel').classList.add('show');
+    document.getElementById('bookingPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  function askRemoveSlot(id) {
+    slotToRemove = id;
+    document.getElementById('removeSlotId').textContent = id;
+    document.getElementById('removeModal').classList.add('show');
+  }
+
+  function confirmRemove() {
+    if (!slotToRemove) return;
+    const el = document.getElementById('slot_'+slotToRemove);
+    slots[slotToRemove].status = 'available';
+    el.className = 'slot available';
+    el.innerHTML = `<div class="slot-icon">⬜</div><div class="slot-id">${slotToRemove}</div>`;
+    el.onclick = () => selectSlot(slotToRemove);
+    slotToRemove = null;
+    document.getElementById('removeModal').classList.remove('show');
+    updateStats();
+  }
+
+  function cancelRemove() {
+    slotToRemove = null;
+    document.getElementById('removeModal').classList.remove('show');
+  }
+
+  function updateStats() {
+    const all = Object.values(slots);
+    const avail = all.filter(s=>s.status==='available').length;
+    const booked = all.filter(s=>s.status==='booked').length;
+    document.getElementById('availCount').textContent = avail;
+    document.getElementById('bookedCount').textContent = booked;
+    document.getElementById('liveBadge').textContent = `${avail} slot${avail!==1?'s':''} open right now — Book fast!`;
+  }
+
+  function confirmBooking() {
+    const vehicle = document.getElementById('vehicleNo').value.trim();
+    const owner = document.getElementById('ownerName').value.trim();
+    const type = document.getElementById('vehicleType').value;
+    const dur = document.getElementById('duration').value;
+    if (!vehicle || !owner) {
+      alert('⚠️ Please enter your Vehicle Number and Owner Name to continue!');
+      return;
+    }
+    if (!selectedSlot) return;
+    const rate = dur==8 ? 200 : dur*30;
+    const ticketNum = '#PK' + String(bookingCount++).padStart(4,'0');
+    slots[selectedSlot].status = 'booked';
+    slots[selectedSlot].vehicle = vehicle.toUpperCase();
+    slots[selectedSlot].owner = owner;
+    slots[selectedSlot].type = type;
+    const el = document.getElementById('slot_'+selectedSlot);
+    el.className = 'slot booked';
+    const bookedId = selectedSlot;
+    el.innerHTML = buildBookedHTML(bookedId);
+    el.onclick = () => askRemoveSlot(bookedId);
+    document.getElementById('ticketNo').textContent = ticketNum;
+    document.getElementById('m_slot').textContent = selectedSlot;
+    document.getElementById('m_vehicle').textContent = vehicle.toUpperCase() + ' (' + type + ')';
+    document.getElementById('m_owner').textContent = owner;
+    document.getElementById('m_duration').textContent = dur==8 ? 'Full Day' : dur+' Hour(s)';
+    document.getElementById('m_amount').textContent = '₹' + rate;
+    document.getElementById('successModal').classList.add('show');
+    document.getElementById('bookingPanel').classList.remove('show');
+    selectedSlot = null;
+    document.getElementById('vehicleNo').value = '';
+    document.getElementById('ownerName').value = '';
+    updateStats();
+  }
+
+  function closeModal() {
+    document.getElementById('successModal').classList.remove('show');
+  }
+
+  generateSlots();
+</script>
+</body>
+</html>
